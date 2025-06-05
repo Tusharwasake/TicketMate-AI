@@ -55,7 +55,8 @@ export default function TicketDetailsPage() {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
-          }        );
+          }
+        );
 
         if (!res.ok) {
           if (res.status === 401) {
@@ -123,7 +124,8 @@ export default function TicketDetailsPage() {
             message: replyText.trim(),
             ...(replyStatus && { status: replyStatus }),
           }),
-        }      );
+        }
+      );
 
       if (!res.ok) {
         if (res.status === 401) {
@@ -166,7 +168,8 @@ export default function TicketDetailsPage() {
             status: "resolved",
           }),
         }
-      );      if (!res.ok) {
+      );
+      if (!res.ok) {
         if (res.status === 401) {
           safeStorage.removeItem("token");
           safeStorage.removeItem("user");
@@ -209,7 +212,8 @@ export default function TicketDetailsPage() {
             assignedTo: currentUser._id,
           }),
         }
-      );      if (!res.ok) {
+      );
+      if (!res.ok) {
         if (res.status === 401) {
           safeStorage.removeItem("token");
           safeStorage.removeItem("user");

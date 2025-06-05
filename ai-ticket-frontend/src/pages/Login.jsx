@@ -21,16 +21,20 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");    try {
+    setError("");
+    try {
       const data = await apiClient.post("/auth/login", form);
-      
+
       // Store token and user data using safe storage
       safeStorage.setItem("token", data.token);
-      safeStorage.setItem("user", JSON.stringify(data.user));        // Navigate to home page
-        navigate("/", { replace: true });
+      safeStorage.setItem("user", JSON.stringify(data.user)); // Navigate to home page
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.message || "Network error. Please check your connection and try again.");
+      setError(
+        err.message ||
+          "Network error. Please check your connection and try again."
+      );
     } finally {
       setLoading(false);
     }

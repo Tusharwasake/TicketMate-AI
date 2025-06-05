@@ -37,7 +37,8 @@ export default function Tickets() {
           "Content-Type": "application/json",
         },
         method: "GET",
-      });      if (!res.ok) {
+      });
+      if (!res.ok) {
         if (res.status === 401) {
           safeStorage.removeItem("token");
           safeStorage.removeItem("user");
@@ -114,7 +115,8 @@ export default function Tickets() {
         setSuccess("Ticket created successfully!");
         // Refresh the tickets list
         await fetchTickets();
-      } else {        if (res.status === 401) {
+      } else {
+        if (res.status === 401) {
           safeStorage.removeItem("token");
           safeStorage.removeItem("user");
           navigate("/login");

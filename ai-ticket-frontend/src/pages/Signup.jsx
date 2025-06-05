@@ -45,9 +45,11 @@ export default function SignupPage() {
     }
 
     setLoading(true);
-    setError("");    try {
-      const url = `${import.meta.env.VITE_SERVER_URL}/auth/signup`;      console.log('Signup URL:', url); // Debug log
-      
+    setError("");
+    try {
+      const url = `${import.meta.env.VITE_SERVER_URL}/auth/signup`;
+      console.log("Signup URL:", url); // Debug log
+
       const res = await fetch(url, {
         method: "POST",
         headers: {

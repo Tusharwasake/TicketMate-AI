@@ -17,13 +17,13 @@ const PORT = process.env.SERVER_PORT;
 // Configure CORS to allow multiple origins
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:5174", 
+  "http://localhost:5174",
   "http://localhost:5175",
   "http://localhost:3000",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:5174",
   "http://127.0.0.1:5175",
-  "https://3aiagentticket.netlify.app", 
+  "https://3aiagentticket.netlify.app",
   "https://aiagentticket.netlify.app", // The actual domain from the error
   "https://ticketmate-ai.onrender.com",
 ];
@@ -45,7 +45,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     preflightContinue: false,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
   })
 );
 
@@ -54,15 +54,15 @@ app.use(express.json());
 // Add logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  console.log('Origin:', req.get('Origin'));
-  console.log('User-Agent:', req.get('User-Agent'));
+  console.log("Origin:", req.get("Origin"));
+  console.log("User-Agent:", req.get("User-Agent"));
   next();
 });
 
 // Add explicit OPTIONS handler for debugging
-app.options('*', (req, res) => {
-  console.log('OPTIONS request received for:', req.url);
-  console.log('Origin:', req.get('Origin'));
+app.options("*", (req, res) => {
+  console.log("OPTIONS request received for:", req.url);
+  console.log("Origin:", req.get("Origin"));
   res.sendStatus(200);
 });
 
