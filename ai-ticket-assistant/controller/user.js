@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-import { inngest } from "../inngest/client.js";
 import dotenv from "dotenv";
+import { eventSender } from "../inngest/eventSender.js";
 dotenv.config();
 
 export const signup = async (req, res) => {
@@ -50,14 +50,14 @@ export const signup = async (req, res) => {
     });
 
     // Fire inngest event
-    const inngestresponse = await inngest.send({
+    const inngestresponse = await eventSender.send({
       name: "user/signup",
       data: {
         email: user.email,
       },
     });
 
-    console.log(inngest);
+    console.log(inngestresponse);
 
     // Generate JWT token
     const token = jwt.sign(

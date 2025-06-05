@@ -1,5 +1,5 @@
-import { inngest } from "../inngest/client.js";
 import Ticket from "../models/ticket.js";
+import { eventSender } from "../inngest/eventSender.js";
 
 export const createTicket = async (req, res) => {
   try {
@@ -24,7 +24,7 @@ export const createTicket = async (req, res) => {
     });
 
     // Trigger background processing with Inngest
-    const inngestResponse = await inngest.send({
+    const inngestResponse = await eventSender.send({
       name: "ticket/created",
       data: {
         ticketId: newTicket._id.toString(),
@@ -165,7 +165,7 @@ export const addTicketReply = async (req, res) => {
     // Trigger notification (you can implement this with Inngest)
     if (user._id.toString() !== ticket.createdBy.toString()) {
       // Send notification to ticket creator
-      await inngest.send({
+      await eventSender.send({
         name: "ticket/reply-added",
         data: {
           ticketId: ticket._id.toString(),
@@ -232,7 +232,7 @@ export const updateTicketStatus = async (req, res) => {
 
     // Notify ticket creator about status change
     if (user._id.toString() !== ticket.createdBy.toString()) {
-      await inngest.send({
+      await eventSender.send({
         name: "ticket/status-updated",
         data: {
           ticketId: ticket._id.toString(),
@@ -293,7 +293,7 @@ export const updateTicket = async (req, res) => {
 
     // Notify ticket creator about important updates
     if (user._id.toString() !== ticket.createdBy.toString()) {
-      await inngest.send({
+      await eventSender.send({
         name: "ticket/updated",
         data: {
           ticketId: ticket._id.toString(),
