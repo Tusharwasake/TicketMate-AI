@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { safeStorage } from "../utils/storage";
 
 export default function Navbar() {
   const [token, setToken] = useState(null);
@@ -7,13 +8,12 @@ export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-
   // Update auth state when component mounts or localStorage changes
   useEffect(() => {
     const updateAuthState = () => {
       try {
-        const storedToken = localStorage.getItem("token");
-        const storedUser = localStorage.getItem("user");
+        const storedToken = safeStorage.getItem("token");
+        const storedUser = safeStorage.getItem("user");
 
         setToken(storedToken);
         setUser(storedUser ? JSON.parse(storedUser) : null);
@@ -22,8 +22,8 @@ export default function Navbar() {
         setToken(null);
         setUser(null);
         // Clean up corrupted data
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        safeStorage.removeItem("token");
+        safeStorage.removeItem("user");
       }
     };
 
@@ -36,10 +36,9 @@ export default function Navbar() {
       window.removeEventListener("storage", updateAuthState);
     };
   }, []);
-
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    safeStorage.removeItem("token");
+    safeStorage.removeItem("user");
     setToken(null);
     setUser(null);
     setShowUserMenu(false);

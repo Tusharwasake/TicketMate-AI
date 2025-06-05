@@ -1,20 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { safeStorage } from "../utils/storage";
 
 function CheckAuth({ children, protected: isProtected = false }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   useEffect(() => {
     const checkAuthentication = () => {
       try {
-        const token = localStorage.getItem("token");
-        const user = localStorage.getItem("user");
+        const token = safeStorage.getItem("token");
+        const userStr = safeStorage.getItem("user");
 
         // Check if token exists and is valid format (basic validation)
         const hasValidToken = token && token.length > 0;
-        const hasValidUser = user && JSON.parse(user);
+        let hasValidUser = false;
+        
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            hasValidUser = !!user;
+          } catch (parseError) {
+            console.warn("Failed to parse user data:", parseError);
+            safeStorage.removeItem("user");
+          }
+        }
 
         setIsAuthenticated(hasValidToken && hasValidUser);
 
@@ -36,9 +46,11 @@ function CheckAuth({ children, protected: isProtected = false }) {
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
+        
         // Clear corrupted data
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        safeStorage.removeItem("token");
+        safeStorage.removeItem("user");
+        
         setIsAuthenticated(false);
 
         if (isProtected) {

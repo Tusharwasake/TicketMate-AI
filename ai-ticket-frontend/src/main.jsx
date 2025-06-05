@@ -4,6 +4,7 @@ import "./index.css";
 // import App from "./App.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CheckAuth from "./components/check-auth.jsx";
+import OAuthCallback from "./components/oauth-callback.jsx";
 import Tickets from "./pages/Tickets.jsx";
 import TicketDetailsPage from "./pages/Ticket.jsx";
 import LoginPage from "./pages/Login.jsx";
@@ -46,6 +47,7 @@ createRoot(document.getElementById("root")).render(
             </CheckAuth>
           }
         />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route
           path="/admin"
           element={

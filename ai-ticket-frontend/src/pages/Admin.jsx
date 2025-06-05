@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
+import { safeStorage } from "../utils/storage";
 
 export default function AdminPanel() {
   const [users, setUsers] = useState([]);
@@ -13,10 +14,10 @@ export default function AdminPanel() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [filterRole, setFilterRole] = useState("all");
-
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = safeStorage.getItem("token");
+  const currentUserStr = safeStorage.getItem("user");
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : {};
 
   // Check admin access
   useEffect(() => {
