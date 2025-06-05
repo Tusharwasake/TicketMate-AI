@@ -15,14 +15,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.SERVER_PORT;
 
-app.use(cors({
-  origin: "*",
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
-}));
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+  })
+);
 
-// Parse JSON before other middleware
 app.use(express.json());
 
 // Add logging middleware
@@ -30,23 +31,14 @@ app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   console.log("Origin:", req.get("Origin"));
   console.log("User-Agent:", req.get("User-Agent"));
-
-  // Log CORS headers being sent
-  console.log("Response CORS Headers:");
-  console.log(
-    "Access-Control-Allow-Origin:",
-    res.get("Access-Control-Allow-Origin")
-  );
-  console.log(
-    "Access-Control-Allow-Methods:",
-    res.get("Access-Control-Allow-Methods")
-  );
-  console.log(
-    "Access-Control-Allow-Headers:",
-    res.get("Access-Control-Allow-Headers")
-  );
-
   next();
+});
+
+// Add explicit OPTIONS handler for debugging
+app.options("*", (req, res) => {
+  console.log("OPTIONS request received for:", req.url);
+  console.log("Origin:", req.get("Origin"));
+  res.sendStatus(200);
 });
 
 app.get("/health", async (req, res) => {
