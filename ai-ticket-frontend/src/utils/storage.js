@@ -49,5 +49,5 @@ export const safeStorage = {
       console.warn("Failed to clear localStorage:", error);
       return false;
     }
-  }
+  },
 };

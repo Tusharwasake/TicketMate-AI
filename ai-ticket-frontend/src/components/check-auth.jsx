@@ -15,7 +15,7 @@ function CheckAuth({ children, protected: isProtected = false }) {
         // Check if token exists and is valid format (basic validation)
         const hasValidToken = token && token.length > 0;
         let hasValidUser = false;
-        
+
         if (userStr) {
           try {
             const user = JSON.parse(userStr);
@@ -46,11 +46,11 @@ function CheckAuth({ children, protected: isProtected = false }) {
         }
       } catch (error) {
         console.error("Authentication check failed:", error);
-        
+
         // Clear corrupted data
         safeStorage.removeItem("token");
         safeStorage.removeItem("user");
-        
+
         setIsAuthenticated(false);
 
         if (isProtected) {

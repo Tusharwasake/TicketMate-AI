@@ -17,14 +17,6 @@ export default function LoginPage() {
     if (error) setError("");
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_SERVER_URL}/auth/google`;
-  };
-
-  const handleFacebookLogin = () => {
-    window.location.href = `${import.meta.env.VITE_SERVER_URL}/auth/facebook`;
-  };
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -39,7 +31,8 @@ export default function LoginPage() {
         body: JSON.stringify(form),
       });
 
-      const data = await res.json();      if (res.ok) {
+      const data = await res.json();
+      if (res.ok) {
         // Store token and user data using safe storage
         safeStorage.setItem("token", data.token);
         safeStorage.setItem("user", JSON.stringify(data.user));
@@ -295,10 +288,10 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {/* Social Login Buttons */}                <div className="grid grid-cols-2 gap-3">
+                {/* Social Login Buttons */}
+                <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={handleGoogleLogin}
                     className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                     disabled={loading}
                   >
@@ -324,7 +317,6 @@ export default function LoginPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={handleFacebookLogin}
                     className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                     disabled={loading}
                   >

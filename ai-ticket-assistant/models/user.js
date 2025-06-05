@@ -1,12 +1,8 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: false }, // Make password optional for OAuth users
-  name: { type: String },
-  avatar: { type: String },
-  googleId: { type: String },
-  facebookId: { type: String },
+  email: { type: String, required: true, unqiue: true },
+  password: { type: String, required: true },
   role: { type: String, default: "user", enum: ["user", "moderator", "admin"] },
   skills: [String],
   createdAt: { type: Date, default: Date.now },
