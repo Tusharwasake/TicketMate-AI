@@ -36,7 +36,6 @@ export default function SignupPage() {
 
     return true;
   };
-
   const handleSignup = async (e) => {
     e.preventDefault();
 
@@ -47,31 +46,20 @@ export default function SignupPage() {
     setLoading(true);
     setError("");
     try {
-      const url = `${import.meta.env.VITE_SERVER_URL}/auth/signup`;
-      console.log("Signup URL:", url); // Debug log
+      const data = await apiClient.post("/auth/signup", form);
 
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
+      // Store token and user data using safe storage
+      safeStorage.setItem("token", data.token);
+      safeStorage.setItem("user", JSON.stringify(data.user));
 
-      const data = await res.json();
-      if (res.ok) {
-        // Store token and user data using safe storage
-        safeStorage.setItem("token", data.token);
-        safeStorage.setItem("user", JSON.stringify(data.user));
-
-        // Navigate to home page
-        navigate("/", { replace: true });
-      } else {
-        setError(data.message || "Signup failed. Please try again.");
-      }
+      // Navigate to home page
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("Signup error:", err);
-      setError("Network error. Please check your connection and try again.");
+      setError(
+        err.message ||
+          "Network error. Please check your connection and try again."
+      );
     } finally {
       setLoading(false);
     }
