@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import Navbar from "../components/navbar";
+import { safeStorage } from "../utils/storage";
 
 export default function TicketDetailsPage() {
   const { id } = useParams();
@@ -18,8 +19,8 @@ export default function TicketDetailsPage() {
   const [resolvingTicket, setResolvingTicket] = useState(false);
   const [assigningTicket, setAssigningTicket] = useState(false);
   const [showReplyBox, setShowReplyBox] = useState(false);
-  const token = localStorage.getItem("token");
-  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = safeStorage.getItem("token");
+  const currentUser = JSON.parse(safeStorage.getItem("user") || "{}");
 
   // Check if user can moderate (admin, moderator, or assigned to this ticket)
   const canModerate =
@@ -54,13 +55,12 @@ export default function TicketDetailsPage() {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
-          }
-        );
+          }        );
 
         if (!res.ok) {
           if (res.status === 401) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
+            safeStorage.removeItem("token");
+            safeStorage.removeItem("user");
             navigate("/login");
             return;
           }
@@ -123,13 +123,12 @@ export default function TicketDetailsPage() {
             message: replyText.trim(),
             ...(replyStatus && { status: replyStatus }),
           }),
-        }
-      );
+        }      );
 
       if (!res.ok) {
         if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          safeStorage.removeItem("token");
+          safeStorage.removeItem("user");
           navigate("/login");
           return;
         }
@@ -167,12 +166,10 @@ export default function TicketDetailsPage() {
             status: "resolved",
           }),
         }
-      );
-
-      if (!res.ok) {
+      );      if (!res.ok) {
         if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          safeStorage.removeItem("token");
+          safeStorage.removeItem("user");
           navigate("/login");
           return;
         }
@@ -212,12 +209,10 @@ export default function TicketDetailsPage() {
             assignedTo: currentUser._id,
           }),
         }
-      );
-
-      if (!res.ok) {
+      );      if (!res.ok) {
         if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          safeStorage.removeItem("token");
+          safeStorage.removeItem("user");
           navigate("/login");
           return;
         }
@@ -654,8 +649,8 @@ export default function TicketDetailsPage() {
 
                             if (!res.ok) {
                               if (res.status === 401) {
-                                localStorage.removeItem("token");
-                                localStorage.removeItem("user");
+                                safeStorage.removeItem("token");
+                                safeStorage.removeItem("user");
                                 navigate("/login");
                                 return;
                               }
@@ -1319,8 +1314,8 @@ export default function TicketDetailsPage() {
 
                                   if (!res.ok) {
                                     if (res.status === 401) {
-                                      localStorage.removeItem("token");
-                                      localStorage.removeItem("user");
+                                      safeStorage.removeItem("token");
+                                      safeStorage.removeItem("user");
                                       navigate("/login");
                                       return;
                                     }

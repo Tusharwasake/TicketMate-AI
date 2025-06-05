@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
+import { safeStorage } from "../utils/storage";
 
 export default function Tickets() {
   const [form, setForm] = useState({ title: "", description: "" });
@@ -13,7 +14,7 @@ export default function Tickets() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const token = safeStorage.getItem("token");
 
   // Redirect if no token
   useEffect(() => {
@@ -36,12 +37,10 @@ export default function Tickets() {
           "Content-Type": "application/json",
         },
         method: "GET",
-      });
-
-      if (!res.ok) {
+      });      if (!res.ok) {
         if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          safeStorage.removeItem("token");
+          safeStorage.removeItem("user");
           navigate("/login");
           return;
         }
@@ -115,10 +114,9 @@ export default function Tickets() {
         setSuccess("Ticket created successfully!");
         // Refresh the tickets list
         await fetchTickets();
-      } else {
-        if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+      } else {        if (res.status === 401) {
+          safeStorage.removeItem("token");
+          safeStorage.removeItem("user");
           navigate("/login");
           return;
         }

@@ -50,8 +50,8 @@ export default function AdminPanel() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          safeStorage.removeItem("token");
+          safeStorage.removeItem("user");
           navigate("/login");
           return;
         }
@@ -154,8 +154,8 @@ export default function AdminPanel() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          safeStorage.removeItem("token");
+          safeStorage.removeItem("user");
           navigate("/login");
           return;
         }

@@ -1,12 +1,42 @@
 import { safeStorage } from "./storage.js";
 
+// Function to safely construct API URLs
+function getBaseURL() {
+  const serverUrl = import.meta.env.VITE_SERVER_URL || import.meta.env.VITE_API_URL;
+  
+  if (serverUrl) {
+    return serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+  }
+  
+  // Fallback for different environments
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:4000/api';
+    }
+    
+    // Production fallback
+    return 'https://ticketmate-ai.onrender.com/api';
+  }
+  
+  // Server-side fallback
+  return 'https://ticketmate-ai.onrender.com/api';
+}
+
 // API utility with better error handling for storage issues
 export const apiClient = {
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
+  baseURL: getBaseURL(),
 
   async request(endpoint, options = {}) {
     try {
       const token = safeStorage.getItem("token");
+      
+      // Ensure endpoint starts with /
+      const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+      const url = `${this.baseURL}${cleanEndpoint}`;
+      
+      console.log(`API Request: ${options.method || 'GET'} ${url}`); // Debug log
 
       const config = {
         headers: {
@@ -17,7 +47,7 @@ export const apiClient = {
         ...options,
       };
 
-      const response = await fetch(`${this.baseURL}${endpoint}`, config);
+      const response = await fetch(url, config);
 
       // Handle authentication errors
       if (response.status === 401) {

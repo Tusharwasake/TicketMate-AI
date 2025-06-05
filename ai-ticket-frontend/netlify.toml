@@ -2,6 +2,10 @@
   publish = "dist"
   command = "npm run build"
 
+[build.environment]
+  VITE_SERVER_URL = "https://ticketmate-ai.onrender.com/api"
+  VITE_API_URL = "https://ticketmate-ai.onrender.com/api"
+
 [[headers]]
   for = "/assets/*.js"
   [headers.values]

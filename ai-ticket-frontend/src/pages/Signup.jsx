@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { safeStorage } from "../utils/storage";
+import { apiClient } from "../utils/api";
 
 export default function SignupPage() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -44,19 +45,16 @@ export default function SignupPage() {
     }
 
     setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/auth/signup`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(form),
-        }
-      );
+    setError("");    try {
+      const url = `${import.meta.env.VITE_SERVER_URL}/auth/signup`;      console.log('Signup URL:', url); // Debug log
+      
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
       const data = await res.json();
       if (res.ok) {

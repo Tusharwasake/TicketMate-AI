@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import { safeStorage } from "../utils/storage";
+import { apiClient } from "../utils/api";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -20,33 +21,16 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        // Store token and user data using safe storage
-        safeStorage.setItem("token", data.token);
-        safeStorage.setItem("user", JSON.stringify(data.user));
-
-        // Navigate to home page
+    setError("");    try {
+      const data = await apiClient.post("/auth/login", form);
+      
+      // Store token and user data using safe storage
+      safeStorage.setItem("token", data.token);
+      safeStorage.setItem("user", JSON.stringify(data.user));        // Navigate to home page
         navigate("/", { replace: true });
-      } else {
-        setError(
-          data.message || "Login failed. Please check your credentials."
-        );
-      }
     } catch (err) {
       console.error("Login error:", err);
-      setError("Network error. Please check your connection and try again.");
+      setError(err.message || "Network error. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
