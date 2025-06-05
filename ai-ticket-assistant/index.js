@@ -15,22 +15,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.SERVER_PORT;
 
-// const allowedOrigins = [
-//   "http://localhost:5173",
-//   "http://localhost:5174",
-//   "http://localhost:5175",
-//   "http://localhost:3000",
-//   "http://127.0.0.1:5173",
-//   "http://127.0.0.1:5174",
-//   "http://127.0.0.1:5175",
-//   "https://3aiagentticket.netlify.app",
-//   "https://aiagentticket.netlify.app/",
-//   "https://ticketmate-ai.onrender.com",
-// ];
-
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => {
+      callback(null, origin || "*");
+    },
+    credentials: true,
   })
 );
 
