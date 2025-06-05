@@ -7,6 +7,7 @@ import { serve } from "inngest/express";
 import { inngest } from "./inngest/client.js";
 import { onUserSignup } from "./inngest/functions/on-signup.js";
 import { onTicketCreated } from "./inngest/functions/on-ticket-create.js";
+import fetch from "node-fetch";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -14,7 +15,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.SERVER_PORT;
 
-// Configure CORS to allow multiple origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -24,28 +24,14 @@ const allowedOrigins = [
   "http://127.0.0.1:5174",
   "http://127.0.0.1:5175",
   "https://3aiagentticket.netlify.app",
-  "https://aiagentticket.netlify.app/", // The actual domain from the error
+  "https://aiagentticket.netlify.app/",
   "https://ticketmate-ai.onrender.com",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.log(`CORS blocked request from origin: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-    preflightContinue: false,
-    optionsSuccessStatus: 200,
   })
 );
 
@@ -85,8 +71,44 @@ mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {
     console.log("MonGoDB connected ");
-    app.listen(PORT, () => {
-      console.log(`Server Started at: http://localhost:${PORT}`);
+    app.listen(PORT, async () => {
+      console.log(`✅Server Started at: http://localhost:${PORT}`);
+      console.log(`➡️ Inngest running at http://localhost:${PORT}/api/inngest`);
+
+      if (process.env.RENDER_EXTERNAL_URL) {
+        console.log(
+          `Attempting self-register. Functions: `,
+          [onUserSignup, onTicketCreated].map((f) => f.name).join(", ")
+        );
+
+        const inngestURL = new URL(
+          "/api/inngest",
+          process.env.RENDER_EXTERNAL_URL
+        );
+        const result = await fetch(inngestURL, {
+          method: "PUT",
+        });
+        function sleep(ms) {
+          return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        try {
+          const json = await result.json();
+          console.log(
+            `Register attempted:`,
+            inngestURL.toString(),
+            result.status,
+            json
+          );
+        } catch (err) {
+          console.log(
+            `Register failed:`,
+            inngestURL.toString(),
+            result.status,
+            result.body
+          );
+        }
+      }
     });
   })
   .catch((err) => console.error("MONGODB Error"));
