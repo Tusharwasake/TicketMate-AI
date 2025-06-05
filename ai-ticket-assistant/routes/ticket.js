@@ -9,7 +9,7 @@ import {
   updateTicketStatus,
 } from "../controller/ticket.js";
 
-const Ticketroutes = express.Router();
+const   Ticketroutes = express.Router();
 
 Ticketroutes.get("/", authenticate, getTickets);
 Ticketroutes.get("/:id", authenticate, getTicket);

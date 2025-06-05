@@ -24,7 +24,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5174",
   "http://127.0.0.1:5175",
   "https://3aiagentticket.netlify.app",
-  "https://aiagentticket.netlify.app", // The actual domain from the error
+  "https://aiagentticket.netlify.app/", // The actual domain from the error
   "https://ticketmate-ai.onrender.com",
 ];
 
