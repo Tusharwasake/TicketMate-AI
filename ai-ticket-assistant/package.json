@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "inngest-dev": "npx inngest-cli@latest dev --port 9288 -u http://localhost:4000/api/inngest"
+    "inngest-dev": "npx inngest-cli@latest dev --port 9288 -u https://ticketmate-ai.onrender.com/api/inngest"
   },
   "keywords": [],
   "author": "",

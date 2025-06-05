@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Page</title>
+  </head>
+  <body>
+    <h1>Test Page</h1>
+    <p>This is a simple test to verify the server configuration.</p>
+
+    <script type="module">
+      console.log("Module script loaded successfully");
+
+      // Test storage access
+      try {
+        localStorage.setItem("test", "value");
+        console.log("localStorage access: OK");
+        localStorage.removeItem("test");
+      } catch (e) {
+        console.warn("localStorage access failed:", e);
+        try {
+          sessionStorage.setItem("test", "value");
+          console.log("sessionStorage access: OK");
+          sessionStorage.removeItem("test");
+        } catch (e2) {
+          console.warn("sessionStorage access also failed:", e2);
+        }
+      }
+
+      // Test if we're in an iframe
+      if (window !== window.parent) {
+        console.warn("Running in iframe - storage restrictions may apply");
+      }
+
+      document.body.innerHTML +=
+        "<p>JavaScript module loaded successfully!</p>";
+    </script>
+  </body>
+</html>
