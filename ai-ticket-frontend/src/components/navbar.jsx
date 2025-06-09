@@ -86,10 +86,16 @@ export default function Navbar() {
                 TicketMate AI
               </span>
             </Link>
-          </div>
-
-          {/* Desktop Navigation */}
+          </div>          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* About Link - Always visible */}
+            <Link
+              to="/about"
+              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+            >
+              About
+            </Link>
+            
             {!token ? (
               <div className="flex items-center space-x-3">
                 <Link
@@ -286,13 +292,20 @@ export default function Navbar() {
               </svg>
             </button>
           </div>
-        </div>
-
-        {/* Mobile Menu */}
+        </div>        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
+            {/* About Link - Always visible */}
+            <Link
+              to="/about"
+              className="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            
             {!token ? (
-              <div className="space-y-3">
+              <div className="space-y-3 border-t border-gray-200 pt-3 mt-3">
                 <Link
                   to="/login"
                   className="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-base font-medium transition-colors duration-200"
@@ -307,9 +320,8 @@ export default function Navbar() {
                 >
                   Get Started
                 </Link>
-              </div>
-            ) : (
-              <div className="space-y-3">
+              </div>            ) : (
+              <div className="space-y-3 border-t border-gray-200 pt-3 mt-3">
                 <div className="px-3 py-2 border-b border-gray-200 pb-3">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold">
