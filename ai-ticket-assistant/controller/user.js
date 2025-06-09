@@ -6,7 +6,7 @@ import { eventSender } from "../inngest/eventSender.js";
 dotenv.config();
 
 export const signup = async (req, res) => {
-  const { email, password, skills = [] } = req.body;
+  const { email, password, role = "user", skills = [] } = req.body;
 
   try {
     // Input validation
@@ -14,6 +14,31 @@ export const signup = async (req, res) => {
       return res.status(400).json({
         error: "Email and password are required",
       });
+    }    // Role validation
+    const allowedRoles = ["user", "moderator"];
+    if (role && !allowedRoles.includes(role)) {
+      return res.status(400).json({
+        error: "Invalid role. Allowed roles are: user, moderator",
+      });
+    }
+
+    // Skills validation
+    if (skills && !Array.isArray(skills)) {
+      return res.status(400).json({
+        error: "Skills must be an array",
+      });
+    }
+
+    // Validate each skill
+    if (skills && skills.length > 0) {
+      const invalidSkills = skills.filter(skill => 
+        typeof skill !== 'string' || skill.trim().length === 0
+      );
+      if (invalidSkills.length > 0) {
+        return res.status(400).json({
+          error: "All skills must be non-empty strings",
+        });
+      }
     }
 
     // Email format validation
@@ -40,13 +65,12 @@ export const signup = async (req, res) => {
     }
 
     // Hash password
-    const hashPassword = await bcrypt.hash(password, 10);
-
-    // Create user with lowercase email for consistency
+    const hashPassword = await bcrypt.hash(password, 10);    // Create user with lowercase email for consistency
     const user = await User.create({
       email: email.toLowerCase(),
       password: hashPassword,
-      skills,
+      role: role || "user", // Set the role, default to "user"
+      skills: skills ? skills.map(skill => skill.trim()).filter(skill => skill.length > 0) : [],
     });
 
     // Fire inngest event

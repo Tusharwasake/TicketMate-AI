@@ -5,18 +5,38 @@ import { safeStorage } from "../utils/storage";
 import { apiClient } from "../utils/api";
 
 export default function SignupPage() {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "", role: "user", skills: [] });
+  const [skillInput, setSkillInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     // Clear error when user starts typing
     if (error) setError("");
   };
 
+  const addSkill = () => {
+    if (skillInput.trim() && !form.skills.includes(skillInput.trim())) {
+      setForm({ ...form, skills: [...form.skills, skillInput.trim()] });
+      setSkillInput("");
+    }
+  };
+
+  const removeSkill = (skillToRemove) => {
+    setForm({ 
+      ...form, 
+      skills: form.skills.filter(skill => skill !== skillToRemove) 
+    });
+  };
+
+  const handleSkillKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addSkill();
+    }
+  };
   const validateForm = () => {
     if (!form.email || !form.password) {
       setError("Email and password are required");
@@ -31,6 +51,11 @@ export default function SignupPage() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
       setError("Please enter a valid email address");
+      return false;
+    }
+
+    if (!["user", "moderator"].includes(form.role)) {
+      setError("Please select a valid role");
       return false;
     }
 
@@ -265,15 +290,158 @@ export default function SignupPage() {
                           ? "Good"
                           : "Strong"}
                       </span>
-                    </div>
-                  )}
+                    </div>                  )}
                 </div>
+
+                {/* Role Selection */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="role"
+                    className="block text-sm font-semibold text-gray-700"
+                  >
+                    Account Type
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                    </div>
+                    <select
+                      id="role"
+                      name="role"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 bg-gray-50 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 appearance-none"
+                      value={form.role}
+                      onChange={handleChange}
+                      required
+                      disabled={loading}
+                    >
+                      <option value="user">User - Submit and track tickets</option>
+                      <option value="moderator">Moderator - Handle and resolve tickets</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>                  <p className="text-xs text-gray-500 mt-1">
+                    {form.role === "user" 
+                      ? "Choose this if you need support and want to submit tickets."
+                      : "Choose this if you want to help resolve tickets and provide support."
+                    }
+                  </p>
+                </div>
+
+                {/* Skills Section - Show for moderators */}
+                {form.role === "moderator" && (
+                  <div className="space-y-3">
+                    <label
+                      htmlFor="skills"
+                      className="block text-sm font-semibold text-gray-700"
+                    >
+                      Skills & Expertise
+                    </label>
+                    <div className="space-y-3">
+                      <div className="flex space-x-2">
+                        <div className="relative flex-1">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg
+                              className="w-5 h-5 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                              />
+                            </svg>
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Add a skill (e.g., JavaScript, Customer Support, Network Administration)"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 bg-gray-50 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-500"
+                            value={skillInput}
+                            onChange={(e) => setSkillInput(e.target.value)}
+                            onKeyPress={handleSkillKeyPress}
+                            disabled={loading}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={addSkill}
+                          disabled={!skillInput.trim() || loading}
+                          className="px-4 py-3 bg-indigo-500 text-white rounded-lg font-medium hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      
+                      {/* Display added skills */}
+                      {form.skills.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-600 font-medium">Your Skills:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {form.skills.map((skill, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 border border-indigo-200"
+                              >
+                                {skill}
+                                <button
+                                  type="button"
+                                  onClick={() => removeSkill(skill)}
+                                  disabled={loading}
+                                  className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full text-indigo-600 hover:bg-indigo-200 hover:text-indigo-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 transition-colors duration-200"
+                                >
+                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <p className="text-xs text-gray-500">
+                        Add skills that highlight your expertise. This helps match you with relevant tickets.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Submit Button */}
                 <button
                   type="submit"
                   className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
-                  disabled={loading || !form.email || !form.password}
+                  disabled={loading || !form.email || !form.password || !form.role}
                 >
                   {loading ? (
                     <div className="flex items-center justify-center space-x-2">
