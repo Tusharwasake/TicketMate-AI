@@ -49,7 +49,7 @@ export default function TicketDetailsPage() {
 
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_SERVER_URL}/tickets/${id}`,
+          `${import.meta.env.VITE_API_URL}/tickets/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -113,7 +113,7 @@ export default function TicketDetailsPage() {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/tickets/${id}/reply`,
+        `${import.meta.env.VITE_API_URL}/tickets/${id}/reply`,
         {
           method: "POST",
           headers: {
@@ -157,7 +157,7 @@ export default function TicketDetailsPage() {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/tickets/${id}/resolve`,
+        `${import.meta.env.VITE_API_URL}/tickets/${id}/resolve`,
         {
           method: "PATCH",
           headers: {
@@ -201,7 +201,7 @@ export default function TicketDetailsPage() {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/tickets/${id}`,
+        `${import.meta.env.VITE_API_URL}/tickets/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -637,7 +637,7 @@ export default function TicketDetailsPage() {
                           try {
                             const res = await fetch(
                               `${
-                                import.meta.env.VITE_SERVER_URL
+                                import.meta.env.VITE_API_URL
                               }/tickets/${id}/resolve`,
                               {
                                 method: "PATCH",
@@ -1302,7 +1302,7 @@ export default function TicketDetailsPage() {
                                 try {
                                   const res = await fetch(
                                     `${
-                                      import.meta.env.VITE_SERVER_URL
+                                      import.meta.env.VITE_API_URL
                                     }/tickets/${id}/resolve`,
                                     {
                                       method: "PATCH",

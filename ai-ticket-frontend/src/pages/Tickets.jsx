@@ -31,7 +31,7 @@ export default function Tickets() {
     setError("");
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/tickets`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export default function Tickets() {
     setSuccess("");
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/tickets`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/tickets`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
