@@ -59,14 +59,16 @@ export default function Navbar() {
     if (!email) return "U";
     return email.split("@")[0].charAt(0).toUpperCase();
   };
-
   return (
     <nav className="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2 group">
+            <Link
+              to={token ? "/tickets" : "/"}
+              className="flex items-center space-x-2 group"
+            >
               <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2 rounded-lg group-hover:from-blue-600 group-hover:to-indigo-700 transition-all duration-200">
                 <svg
                   className="w-6 h-6 text-white"
@@ -86,7 +88,8 @@ export default function Navbar() {
                 TicketMate AI
               </span>
             </Link>
-          </div>          {/* Desktop Navigation */}
+          </div>
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             {/* About Link - Always visible */}
             <Link
@@ -95,20 +98,45 @@ export default function Navbar() {
             >
               About
             </Link>
-            
             {!token ? (
               <div className="flex items-center space-x-3">
                 <Link
                   to="/login"
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 hover:border-blue-300 transition-all duration-200 bg-white hover:bg-blue-50"
                 >
-                  Sign In
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                    />
+                  </svg>
+                  <span>Sign In</span>
                 </Link>
                 <Link
                   to="/signup"
-                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-blue-600 hover:to-indigo-700 transform transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg"
+                  className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:from-blue-600 hover:to-indigo-700 transform transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl border-2 border-transparent hover:border-blue-300"
                 >
-                  Get Started
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                    />
+                  </svg>
+                  <span>Create Account</span>
                 </Link>
               </div>
             ) : (
@@ -261,7 +289,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
@@ -291,8 +318,10 @@ export default function Navbar() {
                 )}
               </svg>
             </button>
-          </div>
-        </div>        {/* Mobile Menu */}
+          </div>{" "}
+        </div>
+
+        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
             {/* About Link - Always visible */}
@@ -303,24 +332,51 @@ export default function Navbar() {
             >
               About
             </Link>
-            
+
             {!token ? (
               <div className="space-y-3 border-t border-gray-200 pt-3 mt-3">
                 <Link
                   to="/login"
-                  className="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-lg text-base font-medium transition-colors duration-200"
+                  className="flex items-center justify-center space-x-2 text-gray-700 hover:text-blue-600 px-4 py-3 rounded-lg text-base font-medium border-2 border-gray-300 hover:border-blue-300 transition-all duration-200 bg-white hover:bg-blue-50 mx-3"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Sign In
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                    />
+                  </svg>
+                  <span>Sign In to Your Account</span>
                 </Link>
                 <Link
                   to="/signup"
-                  className="block bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg text-base font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 text-center"
+                  className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-3 rounded-lg text-base font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl mx-3 border-2 border-transparent"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Get Started
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                    />
+                  </svg>
+                  <span>Create New Account</span>
                 </Link>
-              </div>            ) : (
+              </div>
+            ) : (
               <div className="space-y-3 border-t border-gray-200 pt-3 mt-3">
                 <div className="px-3 py-2 border-b border-gray-200 pb-3">
                   <div className="flex items-center space-x-3">

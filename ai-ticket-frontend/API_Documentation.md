@@ -1,18 +1,51 @@
-# AI Ticket Assistant API Documentation
+# TicketMate AI - Frontend Documentation
 
-## Tech Stack
+## 🎯 Overview
+
+TicketMate AI is a modern, responsive support ticket management system built with React and Tailwind CSS. The application provides an intuitive interface for users to submit tickets, moderators to resolve issues, and administrators to manage the entire system.
+
+## ✨ Key Features
+
+### 🏠 Public Homepage
+
+- **Landing Page**: Welcoming homepage for new visitors
+- **Clear Call-to-Actions**: Prominent signup and signin buttons
+- **Feature Showcase**: Overview of platform capabilities
+- **Mobile-Responsive**: Optimized for all device sizes
+
+### 👥 Role-Based Access
+
+- **User Role**: Submit tickets, track progress, communicate with support
+- **Moderator Role**: Resolve tickets, provide support, showcase skills
+- **Admin Role**: Full system management and analytics access
+
+### 🔧 Enhanced Signup Process
+
+- **Role Selection**: Choose between User or Moderator during registration
+- **Skills Management**: Moderators can add expertise areas (JavaScript, Customer Support, etc.)
+- **Form Validation**: Real-time validation with helpful error messages
+- **Password Strength**: Visual password strength indicator
+
+### 📱 Improved Navigation
+
+- **Enhanced Navbar**: Clear, accessible navigation with role-based menu items
+- **Mobile Menu**: Optimized mobile navigation with touch-friendly buttons
+- **Smart Routing**: Context-aware navigation (home vs dashboard)
+- **Visual Indicators**: Clear visual hierarchy for buttons and links
+
+## 🏗️ Tech Stack
 
 ### Frontend
 
 - **Framework**: React 18+ with Vite
 - **Styling**:
   - Tailwind CSS (utility-first CSS framework)
-  - DaisyUI (Tailwind CSS components)
+  - Custom component library with consistent design system
 - **State Management**: React Hooks (useState, useEffect)
-- **Routing**: React Router DOM
-- **Markdown**: ReactMarkdown for rendering formatted text
-- **Build Tool**: Vite with ESBuild
-- **Package Manager**: npm/yarn
+- **Routing**: React Router DOM v6 with protected routes
+- **Icons**: Heroicons (built into Tailwind)
+- **Build Tool**: Vite with hot reload and fast builds
+- **Package Manager**: npm
 
 ### Backend (Inferred)
 
@@ -64,23 +97,182 @@ ai-ticket-frontend/
 ├── src/
 │   ├── components/
 │   │   ├── ErrorBoundary.jsx      # Global error handling
-│   │   ├── navbar.jsx             # Navigation component
-│   │   ├── check-auth.jsx         # Authentication guard
-│   │   └── check-auth-debug.jsx   # Debug authentication
+│   │   ├── navbar.jsx             # Enhanced navigation with role-based menus
+│   │   ├── check-auth.jsx         # Authentication guard with route protection
+│   │   ├── check-auth-debug.jsx   # Debug authentication
+│   │   └── oauth-callback.jsx     # OAuth authentication callback
 │   ├── pages/
-│   │   ├── Tickets.jsx           # Main tickets dashboard
-│   │   ├── Ticket.jsx            # Individual ticket view
-│   │   ├── Login.jsx             # Login page
-│   │   ├── Signup.jsx            # Registration page
-│   │   └── Admin.jsx             # Admin panel
+│   │   ├── Home.jsx              # Public landing page (NEW)
+│   │   ├── About.jsx             # About page with platform information (NEW)
+│   │   ├── Signup.jsx            # Enhanced signup with role/skills selection (UPDATED)
+│   │   ├── Login.jsx             # User authentication
+│   │   ├── Tickets.jsx           # Main tickets dashboard (protected)
+│   │   ├── Ticket.jsx            # Individual ticket view (protected)
+│   │   └── Admin.jsx             # Admin panel (admin-only)
 │   ├── utils/
-│   │   ├── api.js                # API client utilities
-│   │   └── storage.js            # Safe storage wrapper
-│   ├── index.css                 # Tailwind imports
-│   └── main.jsx                  # App entry point
+│   │   ├── api.js                # Centralized API client
+│   │   └── storage.js            # Safe storage utilities
+│   ├── main.jsx                  # App entry point with routing
+│   └── index.css                 # Global styles with Tailwind
+├── public/
+│   ├── _redirects               # Netlify routing configuration
+│   └── vite.svg                 # App icon
+├── netlify.toml                 # Netlify deployment config
+├── package.json                 # Dependencies and scripts
+└── vite.config.js              # Vite configuration
+```
+
+### Page Descriptions
+
+#### 🏠 Home.jsx (Public Landing Page)
+
+- **Purpose**: Welcome new users and provide clear signup/signin options
+- **Features**:
+  - Hero section with call-to-action buttons
+  - Feature showcase for different user types
+  - Trust indicators and platform benefits
+  - Responsive design for all devices
+- **Access**: Public (no authentication required)
+
+#### ℹ️ About.jsx (Platform Information)
+
+- **Purpose**: Explain platform features and capabilities
+- **Features**:
+  - Detailed feature descriptions
+  - Benefits for different user roles
+  - Professional layout with visual elements
+- **Access**: Public (available to all users)
+
+#### ✍️ Signup.jsx (Enhanced Registration)
+
+- **Purpose**: User registration with role selection and skills
+- **Features**:
+  - Role selection (User vs Moderator)
+  - Skills input for moderators
+  - Real-time form validation
+  - Password strength indicator
+  - Responsive form design
+- **Access**: Public (redirects if already authenticated)
+
+#### 🔐 Login.jsx (Authentication)
+
+- **Purpose**: User authentication
+- **Features**:
+  - Email/password authentication
+  - Remember me functionality
+  - Error handling and validation
+- **Access**: Public (redirects if already authenticated)
+
+#### 🎫 Tickets.jsx (Dashboard)
+
+- **Purpose**: Main application dashboard
+- **Features**:
+  - View all tickets
+  - Create new tickets
+  - Filter and search tickets
+  - Role-based actions
+- **Access**: Protected (requires authentication)
+
+#### 📋 Ticket.jsx (Ticket Details)
+
+- **Purpose**: Individual ticket management
+- **Features**:
+  - View ticket details
+  - Add replies
+  - Update ticket status
+  - AI-powered suggestions
+- **Access**: Protected (requires authentication)
+
+#### ⚙️ Admin.jsx (Administration)
+
+- **Purpose**: System administration
+- **Features**:
+  - User management
+  - System analytics
+  - Global settings
+- **Access**: Admin-only (requires admin role)
+
+### Routing Configuration
+
+```jsx
+// main.jsx routing structure
+<Routes>
+  {/* Public Routes */}
+  <Route
+    path="/"
+    element={
+      <CheckAuth protected={false}>
+        <HomePage />
+      </CheckAuth>
+    }
+  />
+  <Route
+    path="/about"
+    element={
+      <CheckAuth protected={false}>
+        <AboutPage />
+      </CheckAuth>
+    }
+  />
+  <Route
+    path="/login"
+    element={
+      <CheckAuth protected={false}>
+        <LoginPage />
+      </CheckAuth>
+    }
+  />
+  <Route
+    path="/signup"
+    element={
+      <CheckAuth protected={false}>
+        <SignupPage />
+      </CheckAuth>
+    }
+  />
+
+  {/* Protected Routes */}
+  <Route
+    path="/tickets"
+    element={
+      <CheckAuth protected={true}>
+        <Tickets />
+      </CheckAuth>
+    }
+  />
+  <Route
+    path="/tickets/:id"
+    element={
+      <CheckAuth protected={true}>
+        <TicketDetailsPage />
+      </CheckAuth>
+    }
+  />
+
+  {/* Admin-only Routes */}
+  <Route
+    path="/admin"
+    element={
+      <CheckAuth protected={true}>
+        <AdminPanel />
+      </CheckAuth>
+    }
+  />
+</Routes>
+```
+
+│ │ ├── Login.jsx # Login page
+│ │ ├── Signup.jsx # Registration page
+│ │ └── Admin.jsx # Admin panel
+│ ├── utils/
+│ │ ├── api.js # API client utilities
+│ │ └── storage.js # Safe storage wrapper
+│ ├── index.css # Tailwind imports
+│ └── main.jsx # App entry point
 ├── index.html
-├── vite.config.js               # Vite configuration
+├── vite.config.js # Vite configuration
 └── package.json
+
 ```
 
 ### State Management Strategy
@@ -103,8 +295,10 @@ ai-ticket-frontend/
 All protected endpoints require a Bearer token in the Authorization header:
 
 ```
+
 Authorization: Bearer <token>
-```
+
+````
 
 ## Data Models
 
@@ -120,7 +314,7 @@ Authorization: Bearer <token>
   createdAt: Date
   updatedAt: Date
 }
-```
+````
 
 ### Ticket
 

@@ -5,7 +5,12 @@ import { safeStorage } from "../utils/storage";
 import { apiClient } from "../utils/api";
 
 export default function SignupPage() {
-  const [form, setForm] = useState({ email: "", password: "", role: "user", skills: [] });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    role: "user",
+    skills: [],
+  });
   const [skillInput, setSkillInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,14 +30,14 @@ export default function SignupPage() {
   };
 
   const removeSkill = (skillToRemove) => {
-    setForm({ 
-      ...form, 
-      skills: form.skills.filter(skill => skill !== skillToRemove) 
+    setForm({
+      ...form,
+      skills: form.skills.filter((skill) => skill !== skillToRemove),
     });
   };
 
   const handleSkillKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       addSkill();
     }
@@ -71,14 +76,16 @@ export default function SignupPage() {
     setLoading(true);
     setError("");
     try {
-      const data = await apiClient.post("/auth/signup", form);
-
-      // Store token and user data using safe storage
+      const data = await apiClient.post("/auth/signup", form); // Store token and user data using safe storage
       safeStorage.setItem("token", data.token);
       safeStorage.setItem("user", JSON.stringify(data.user));
 
-      // Navigate to home page
-      navigate("/", { replace: true });
+      // Navigate based on user role - moderators go to profile to set up skills
+      if (data.user.role === "moderator") {
+        navigate("/profile", { replace: true, state: { fromSignup: true } });
+      } else {
+        navigate("/", { replace: true });
+      }
     } catch (err) {
       console.error("Signup error:", err);
       setError(
@@ -290,7 +297,8 @@ export default function SignupPage() {
                           ? "Good"
                           : "Strong"}
                       </span>
-                    </div>                  )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Role Selection */}
@@ -326,8 +334,12 @@ export default function SignupPage() {
                       required
                       disabled={loading}
                     >
-                      <option value="user">User - Submit and track tickets</option>
-                      <option value="moderator">Moderator - Handle and resolve tickets</option>
+                      <option value="user">
+                        User - Submit and track tickets
+                      </option>
+                      <option value="moderator">
+                        Moderator - Handle and resolve tickets
+                      </option>
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                       <svg
@@ -344,11 +356,11 @@ export default function SignupPage() {
                         />
                       </svg>
                     </div>
-                  </div>                  <p className="text-xs text-gray-500 mt-1">
-                    {form.role === "user" 
+                  </div>{" "}
+                  <p className="text-xs text-gray-500 mt-1">
+                    {form.role === "user"
                       ? "Choose this if you need support and want to submit tickets."
-                      : "Choose this if you want to help resolve tickets and provide support."
-                    }
+                      : "Choose this if you want to help resolve tickets and provide support."}
                   </p>
                 </div>
 
@@ -398,11 +410,13 @@ export default function SignupPage() {
                           Add
                         </button>
                       </div>
-                      
+
                       {/* Display added skills */}
                       {form.skills.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs text-gray-600 font-medium">Your Skills:</p>
+                          <p className="text-xs text-gray-600 font-medium">
+                            Your Skills:
+                          </p>
                           <div className="flex flex-wrap gap-2">
                             {form.skills.map((skill, index) => (
                               <span
@@ -416,7 +430,11 @@ export default function SignupPage() {
                                   disabled={loading}
                                   className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full text-indigo-600 hover:bg-indigo-200 hover:text-indigo-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50 transition-colors duration-200"
                                 >
-                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg
+                                    className="w-3 h-3"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
                                     <path
                                       fillRule="evenodd"
                                       d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -429,9 +447,10 @@ export default function SignupPage() {
                           </div>
                         </div>
                       )}
-                      
+
                       <p className="text-xs text-gray-500">
-                        Add skills that highlight your expertise. This helps match you with relevant tickets.
+                        Add skills that highlight your expertise. This helps
+                        match you with relevant tickets.
                       </p>
                     </div>
                   </div>
@@ -441,7 +460,9 @@ export default function SignupPage() {
                 <button
                   type="submit"
                   className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold text-sm hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
-                  disabled={loading || !form.email || !form.password || !form.role}
+                  disabled={
+                    loading || !form.email || !form.password || !form.role
+                  }
                 >
                   {loading ? (
                     <div className="flex items-center justify-center space-x-2">

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Component Test</title>
+  </head>
+  <body>
+    <div id="test-root"></div>
+    <script type="module">
+      import React from "react";
+      import ReactDOM from "react-dom/client";
+      import ProfileSimple from "../src/pages/ProfileSimple.jsx";
+
+      // This script tests if the Profile component can be imported correctly
+      try {
+        console.log(
+          "ProfileSimple component imported successfully:",
+          ProfileSimple
+        );
+        console.log("ProfileSimple component type:", typeof ProfileSimple);
+
+        const root = ReactDOM.createRoot(document.getElementById("test-root"));
+        root.render(
+          React.createElement("div", null, "Profile import test successful!")
+        );
+
+        document.body.style.background = "#f0fff0";
+        document.body.innerHTML +=
+          '<div style="padding: 20px; text-align: center;"><h1>✅ Profile Component Imported Successfully!</h1></div>';
+      } catch (error) {
+        console.error("Error importing ProfileSimple component:", error);
+        document.body.style.background = "#fff0f0";
+        document.body.innerHTML += `<div style="padding: 20px; text-align: center;"><h1>❌ Profile Import Error</h1><pre>${error.message}</pre></div>`;
+      }
+    </script>
+  </body>
+</html>

@@ -4,29 +4,28 @@ import { safeStorage } from "../utils/storage";
 
 function CheckAuth({ children, protected: isProtected = false }) {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  useEffect(() => {
+  const [loading, setLoading] = useState(true);useEffect(() => {
     const checkAuthentication = () => {
       try {
-        const token = safeStorage.getItem("token");
-        const userStr = safeStorage.getItem("user");
+        // Allow access to the /signup route for testing purposes
+        if (window.location.pathname === "/signup") {
+          setLoading(false);
+          return;
+        }
 
-        // Check if token exists and is valid format (basic validation)
+        const token = safeStorage.getItem("token");
+        const userStr = safeStorage.getItem("user");        // Check if token exists and is valid format (basic validation)
         const hasValidToken = token && token.length > 0;
-        let hasValidUser = false;
 
         if (userStr) {
           try {
-            const user = JSON.parse(userStr);
-            hasValidUser = !!user;
+            JSON.parse(userStr); // Just validate that user data is parseable
           } catch (parseError) {
             console.warn("Failed to parse user data:", parseError);
             safeStorage.removeItem("user");
-          }
-        }
+          }        }
 
-        setIsAuthenticated(hasValidToken && hasValidUser);
+        // Authentication check completed - no need to store state
 
         // If route is protected and user is not authenticated, redirect to login
         if (isProtected && !hasValidToken) {
@@ -34,24 +33,21 @@ function CheckAuth({ children, protected: isProtected = false }) {
           return;
         }
 
-        // If user is authenticated and trying to access login/signup, redirect to home
+        // If user is authenticated and trying to access login, redirect to home
         if (
           !isProtected &&
           hasValidToken &&
-          (window.location.pathname === "/login" ||
-            window.location.pathname === "/signup")
+          window.location.pathname === "/login"
         ) {
           navigate("/", { replace: true });
           return;
         }
       } catch (error) {
-        console.error("Authentication check failed:", error);
-
-        // Clear corrupted data
+        console.error("Authentication check failed:", error);        // Clear corrupted data
         safeStorage.removeItem("token");
         safeStorage.removeItem("user");
 
-        setIsAuthenticated(false);
+        // Authentication failed - no need to store state
 
         if (isProtected) {
           navigate("/login", { replace: true });

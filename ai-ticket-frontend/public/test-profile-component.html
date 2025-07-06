@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Component Test</title>
+</head>
+<body>
+    <div id="test-results"></div>
+    
+    <script type="module">
+        try {
+            // Test if we can import the Profile component
+            const profileModule = await import('../src/pages/Profile.jsx');
+            console.log('Profile module loaded successfully:', profileModule);
+            
+            if (profileModule.default) {
+                document.getElementById('test-results').innerHTML = `
+                    <div style="color: green; font-family: monospace; padding: 20px;">
+                        ✅ SUCCESS: Profile component exports default function<br>
+                        Component type: ${typeof profileModule.default}<br>
+                        Component name: ${profileModule.default.name}
+                    </div>
+                `;
+            } else {
+                document.getElementById('test-results').innerHTML = `
+                    <div style="color: red; font-family: monospace; padding: 20px;">
+                        ❌ ERROR: Profile component does not have default export<br>
+                        Available exports: ${Object.keys(profileModule).join(', ')}
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Import error:', error);
+            document.getElementById('test-results').innerHTML = `
+                <div style="color: red; font-family: monospace; padding: 20px;">
+                    ❌ IMPORT ERROR: ${error.message}<br>
+                    Stack: ${error.stack}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

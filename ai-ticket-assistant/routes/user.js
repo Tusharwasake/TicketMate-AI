@@ -5,6 +5,7 @@ import {
   logout,
   signup,
   updateUser,
+  updateProfile,
 } from "../controller/user.js";
 import { authenticate } from "../middlewares/auth.js";
 
@@ -14,6 +15,7 @@ userRoutes.post("/signup", signup);
 userRoutes.post("/login", login);
 
 userRoutes.post("/update-user", authenticate, updateUser);
+userRoutes.patch("/profile", authenticate, updateProfile);
 userRoutes.get("/users", authenticate, getUsers);
 userRoutes.post("/logout", logout);
 

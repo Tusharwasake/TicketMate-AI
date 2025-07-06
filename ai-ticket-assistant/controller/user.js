@@ -14,7 +14,7 @@ export const signup = async (req, res) => {
       return res.status(400).json({
         error: "Email and password are required",
       });
-    }    // Role validation
+    } // Role validation
     const allowedRoles = ["user", "moderator"];
     if (role && !allowedRoles.includes(role)) {
       return res.status(400).json({
@@ -31,8 +31,8 @@ export const signup = async (req, res) => {
 
     // Validate each skill
     if (skills && skills.length > 0) {
-      const invalidSkills = skills.filter(skill => 
-        typeof skill !== 'string' || skill.trim().length === 0
+      const invalidSkills = skills.filter(
+        (skill) => typeof skill !== "string" || skill.trim().length === 0
       );
       if (invalidSkills.length > 0) {
         return res.status(400).json({
@@ -65,12 +65,16 @@ export const signup = async (req, res) => {
     }
 
     // Hash password
-    const hashPassword = await bcrypt.hash(password, 10);    // Create user with lowercase email for consistency
+    const hashPassword = await bcrypt.hash(password, 10); // Create user with lowercase email for consistency
     const user = await User.create({
       email: email.toLowerCase(),
       password: hashPassword,
       role: role || "user", // Set the role, default to "user"
-      skills: skills ? skills.map(skill => skill.trim()).filter(skill => skill.length > 0) : [],
+      skills: skills
+        ? skills
+            .map((skill) => skill.trim())
+            .filter((skill) => skill.length > 0)
+        : [],
     });
 
     // Fire inngest event
@@ -244,6 +248,63 @@ export const updateUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Update user error:", error);
+    res.status(500).json({
+      error: "Update failed",
+      details: error.message,
+    });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  const { skills = [] } = req.body;
+
+  try {
+    // Get user from authenticated token
+    const userId = req.user._id;
+
+    // Skills validation
+    if (!Array.isArray(skills)) {
+      return res.status(400).json({
+        error: "Skills must be an array",
+      });
+    }
+
+    // Validate each skill
+    if (skills.length > 0) {
+      const invalidSkills = skills.filter(
+        (skill) => typeof skill !== "string" || skill.trim().length === 0
+      );
+      if (invalidSkills.length > 0) {
+        return res.status(400).json({
+          error: "All skills must be non-empty strings",
+        });
+      }
+    }
+
+    // Clean up skills (trim whitespace and remove empty values)
+    const cleanedSkills = skills
+      .map((skill) => skill.trim())
+      .filter((skill) => skill.length > 0);
+
+    // Update user's skills
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { skills: cleanedSkills },
+      { new: true, select: "-password" }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
     res.status(500).json({
       error: "Update failed",
       details: error.message,

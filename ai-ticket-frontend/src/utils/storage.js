@@ -4,6 +4,7 @@
 class FallbackStorage {
   constructor() {
     this.storage = new Map();
+    console.warn("Using fallback memory storage - data will not persist across browser sessions");
   }
 
   getItem(key) {
@@ -26,6 +27,7 @@ class FallbackStorage {
 // Check if we're in a restricted context (iframe, private browsing, etc.)
 function isStorageAvailable(type) {
   try {
+    // Skip storage check in SSR environment
     if (typeof window === "undefined") return false;
 
     const storage = window[type];
@@ -33,27 +35,37 @@ function isStorageAvailable(type) {
 
     const testKey = "__storage_test__";
     storage.setItem(testKey, "test");
+    const testValue = storage.getItem(testKey);
     storage.removeItem(testKey);
-    return true;
+    return testValue === "test";
   } catch (e) {
+    console.warn(`${type} test failed:`, e.message);
     return false;
   }
 }
 
 // Determine the best available storage
 function getBestStorage() {
-  if (isStorageAvailable("localStorage")) {
-    return window.localStorage;
-  }
-  if (isStorageAvailable("sessionStorage")) {
-    console.warn("localStorage not available, falling back to sessionStorage");
-    return window.sessionStorage;
+  try {
+    if (isStorageAvailable("localStorage")) {
+      console.info("Using localStorage");
+      return window.localStorage;
+    }
+    if (isStorageAvailable("sessionStorage")) {
+      console.warn("localStorage not available, falling back to sessionStorage");
+      return window.sessionStorage;
+    }
+  } catch (e) {
+    console.error("Storage access completely blocked:", e.message);
   }
   console.warn("No web storage available, falling back to memory storage");
   return new FallbackStorage();
 }
 
 const storage = getBestStorage();
+
+// Add detailed logging to track storage fallback
+console.info("Using storage type:", storage instanceof FallbackStorage ? "FallbackStorage (in-memory)" : storage === window.sessionStorage ? "sessionStorage" : "localStorage");
 
 export const safeStorage = {
   getItem: (key) => {

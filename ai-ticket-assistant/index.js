@@ -15,42 +15,44 @@ dotenv.config();
 const app = express();
 const PORT = process.env.SERVER_PORT;
 
+// CORS configuration
 app.use(
   cors({
-    origin: "*",
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000", 
+      "https://aiagentticket.netlify.app",
+      "https://ticketmate-ai.netlify.app"
+    ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
       "X-Requested-With",
       "Accept",
-      "Origin",
-    ],
+      "Origin"
+    ]
   })
 );
 
 app.use(express.json());
 
-// Add logging middleware
+// Add security headers for CORS
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  console.log("Origin:", req.get("Origin"));
-  console.log("User-Agent:", req.get("User-Agent"));
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
   next();
 });
 
-// Add explicit OPTIONS handler for debugging
-app.options("*", (req, res) => {
-  console.log("OPTIONS request received for:", req.url);
-  console.log("Origin:", req.get("Origin"));
-  res.sendStatus(200);
-});
-
 app.get("/health", async (req, res) => {
-  res.send("healthy");
+  res.json({ 
+    status: "healthy", 
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+  });
 });
-
 app.use("/api/auth", userRoutes);
 app.use("/api/tickets", Ticketroutes);
 

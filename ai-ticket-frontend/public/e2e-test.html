@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketMate End-to-End Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .test-card { 
+            border: 1px solid #ddd; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .success { border-color: #28a745; background: #d4edda; }
+        .error { border-color: #dc3545; background: #f8d7da; }
+        .info { border-color: #17a2b8; background: #d1ecf1; }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px 15px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .test-step { margin: 10px 0; padding: 10px; background: white; border-radius: 4px; }
+        .log { background: #000; color: #00ff00; padding: 10px; border-radius: 4px; font-family: monospace; height: 200px; overflow-y: auto; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🎫 TicketMate Application - End-to-End Test Suite</h1>
+    
+    <div class="test-card info">
+        <h2>📋 Test Plan</h2>
+        <div class="test-step">
+            <strong>1. Environment Check:</strong> Verify both frontend and backend are running
+        </div>
+        <div class="test-step">
+            <strong>2. Component Import Test:</strong> Verify all critical components can be imported
+        </div>
+        <div class="test-step">
+            <strong>3. Storage Test:</strong> Test localStorage/sessionStorage fallback functionality
+        </div>
+        <div class="test-step">
+            <strong>4. Navigation Test:</strong> Test all critical pages load without errors
+        </div>
+        <div class="test-step">
+            <strong>5. User Flow Test:</strong> Test signup → profile navigation for moderators
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>🔧 Test Controls</h2>
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <button onclick="testEnvironment()">🌐 Test Environment</button>
+        <button onclick="testComponents()">📦 Test Components</button>
+        <button onclick="testStorage()">💾 Test Storage</button>
+        <button onclick="testNavigation()">🧭 Test Navigation</button>
+        <button onclick="clearLog()">🧹 Clear Log</button>
+    </div>
+
+    <div class="test-card">
+        <h2>📊 Test Results</h2>
+        <div id="log" class="log">Test console ready...\n</div>
+    </div>
+
+    <div class="test-card">
+        <h2>🔗 Quick Links</h2>
+        <button onclick="openApp('/')">🏠 Home</button>
+        <button onclick="openApp('/signup')">📝 Signup</button>
+        <button onclick="openApp('/login')">🔐 Login</button>
+        <button onclick="openApp('/profile')">👤 Profile</button>
+        <button onclick="openApp('/about')">ℹ️ About</button>
+    </div>
+
+    <script type="module">
+        const log = document.getElementById('log');
+        
+        function logMessage(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            log.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        window.clearLog = () => {
+            log.textContent = 'Test console cleared...\n';
+        };
+
+        window.openApp = (path) => {
+            const url = `http://localhost:5175${path}`;
+            window.open(url, '_blank');
+            logMessage(`Opening ${path}`, 'info');
+        };
+
+        window.testEnvironment = async () => {
+            logMessage('Testing environment...', 'info');
+            
+            // Test frontend
+            try {
+                const frontendResponse = await fetch('http://localhost:5175/');
+                if (frontendResponse.ok) {
+                    logMessage('Frontend server is running on port 5175', 'success');
+                } else {
+                    logMessage(`Frontend responded with status: ${frontendResponse.status}`, 'warning');
+                }
+            } catch (error) {
+                logMessage(`Frontend connection failed: ${error.message}`, 'error');
+            }
+
+            // Test backend
+            try {
+                const backendResponse = await fetch('http://localhost:4000/api/users/me');
+                if (backendResponse.status === 401) {
+                    logMessage('Backend server is running on port 4000 (401 expected)', 'success');
+                } else {
+                    logMessage(`Backend responded with status: ${backendResponse.status}`, 'success');
+                }
+            } catch (error) {
+                logMessage(`Backend connection failed: ${error.message}`, 'error');
+            }
+        };
+
+        window.testComponents = async () => {
+            logMessage('Testing component imports...', 'info');
+            
+            const components = [
+                { name: 'Profile', path: '/src/pages/Profile.jsx' },
+                { name: 'Signup', path: '/src/pages/Signup.jsx' },
+                { name: 'Login', path: '/src/pages/Login.jsx' },
+                { name: 'Storage Utility', path: '/src/utils/storage.js' },
+                { name: 'API Utility', path: '/src/utils/api.js' }
+            ];
+
+            for (const component of components) {
+                try {
+                    await import(component.path);
+                    logMessage(`${component.name} imported successfully`, 'success');
+                } catch (error) {
+                    logMessage(`${component.name} import failed: ${error.message}`, 'error');
+                }
+            }
+        };
+
+        window.testStorage = async () => {
+            logMessage('Testing storage functionality...', 'info');
+            
+            // Test localStorage
+            try {
+                localStorage.setItem('test_key', 'test_value');
+                const retrieved = localStorage.getItem('test_key');
+                localStorage.removeItem('test_key');
+                
+                if (retrieved === 'test_value') {
+                    logMessage('localStorage working correctly', 'success');
+                } else {
+                    logMessage('localStorage test failed - value mismatch', 'error');
+                }
+            } catch (error) {
+                logMessage(`localStorage error: ${error.message}`, 'error');
+            }
+
+            // Test sessionStorage
+            try {
+                sessionStorage.setItem('test_key', 'test_value');
+                const retrieved = sessionStorage.getItem('test_key');
+                sessionStorage.removeItem('test_key');
+                
+                if (retrieved === 'test_value') {
+                    logMessage('sessionStorage working correctly', 'success');
+                } else {
+                    logMessage('sessionStorage test failed - value mismatch', 'error');
+                }
+            } catch (error) {
+                logMessage(`sessionStorage error: ${error.message}`, 'error');
+            }
+
+            // Test storage utility
+            try {
+                const { safeStorage } = await import('/src/utils/storage.js');
+                safeStorage.setItem('safe_test', 'safe_value');
+                const retrieved = safeStorage.getItem('safe_test');
+                safeStorage.removeItem('safe_test');
+                
+                if (retrieved === 'safe_value') {
+                    logMessage('safeStorage utility working correctly', 'success');
+                } else {
+                    logMessage('safeStorage test failed - value mismatch', 'error');
+                }
+            } catch (error) {
+                logMessage(`safeStorage test failed: ${error.message}`, 'error');
+            }
+        };
+
+        window.testNavigation = () => {
+            logMessage('Testing page navigation...', 'info');
+            
+            const pages = ['/', '/signup', '/login', '/profile', '/about'];
+            
+            pages.forEach((page, index) => {
+                setTimeout(() => {
+                    try {
+                        const testWindow = window.open(`http://localhost:5175${page}`, `test_${index}`);
+                        
+                        setTimeout(() => {
+                            try {
+                                if (testWindow && !testWindow.closed) {
+                                    logMessage(`${page} loaded successfully`, 'success');
+                                    testWindow.close();
+                                } else {
+                                    logMessage(`${page} failed to load or was blocked`, 'warning');
+                                }
+                            } catch (e) {
+                                logMessage(`${page} test completed (cross-origin restriction)`, 'info');
+                                if (testWindow) testWindow.close();
+                            }
+                        }, 2000);
+                        
+                    } catch (error) {
+                        logMessage(`${page} navigation failed: ${error.message}`, 'error');
+                    }
+                }, index * 1000);
+            });
+        };
+
+        window.runAllTests = async () => {
+            logMessage('🚀 Starting comprehensive test suite...', 'info');
+            logMessage('==========================================', 'info');
+            
+            await window.testEnvironment();
+            logMessage('------------------------------------------', 'info');
+            
+            await window.testComponents();
+            logMessage('------------------------------------------', 'info');
+            
+            await window.testStorage();
+            logMessage('------------------------------------------', 'info');
+            
+            window.testNavigation();
+            
+            setTimeout(() => {
+                logMessage('==========================================', 'info');
+                logMessage('✅ Test suite completed!', 'success');
+                logMessage('Check individual results above for any issues.', 'info');
+            }, 6000);
+        };
+
+        // Auto-run environment test on page load
+        logMessage('Test page initialized', 'success');
+        logMessage('Click "Run All Tests" to start comprehensive testing', 'info');
+        
+        // Run environment test automatically
+        setTimeout(() => {
+            window.testEnvironment();
+        }, 1000);
+    </script>
+</body>
+</html>

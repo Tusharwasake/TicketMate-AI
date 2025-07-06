@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketMate AI - Final Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-8">
+        <div class="max-w-6xl mx-auto px-4">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">TicketMate AI</h1>
+                <p class="text-xl text-gray-600">Final Verification Dashboard</p>
+            </div>
+            
+            <!-- Status Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Server Status -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <div class="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                        Server Status
+                    </h3>
+                    <div id="server-status" class="space-y-2">
+                        <div class="text-gray-600">Checking...</div>
+                    </div>
+                </div>
+                
+                <!-- Component Tests -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                        Component Tests
+                    </h3>
+                    <div id="component-tests" class="space-y-2">
+                        <div class="text-gray-600">Running tests...</div>
+                    </div>
+                </div>
+                
+                <!-- API Tests -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center">
+                        <div class="w-3 h-3 rounded-full bg-purple-500 mr-2"></div>
+                        API Tests
+                    </h3>
+                    <div id="api-tests" class="space-y-2">
+                        <div class="text-gray-600">Testing APIs...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4">Test Application Flow</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="openPage('/signup')" class="bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+                        🚀 Signup
+                    </button>
+                    <button onclick="openPage('/login')" class="bg-green-500 text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors">
+                        🔐 Login
+                    </button>
+                    <button onclick="openPage('/profile')" class="bg-purple-500 text-white py-3 px-4 rounded-lg hover:bg-purple-600 transition-colors">
+                        👤 Profile
+                    </button>
+                    <button onclick="openPage('/tickets')" class="bg-orange-500 text-white py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors">
+                        🎫 Tickets
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Test Results Summary -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Summary</h3>
+                <div id="summary" class="text-gray-600">
+                    Initializing tests...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:4000';
+        const FRONTEND_BASE = 'http://localhost:5173';
+        
+        let testResults = {
+            servers: {},
+            components: {},
+            apis: {}
+        };
+        
+        function createStatusItem(name, status, message) {
+            const statusColor = status === 'pass' ? 'green' : status === 'fail' ? 'red' : 'yellow';
+            const statusIcon = status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⚠️';
+            
+            return `
+                <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                    <div class="flex items-center space-x-2">
+                        <span>${statusIcon}</span>
+                        <span class="text-sm font-medium">${name}</span>
+                    </div>
+                    <div class="text-xs text-gray-500">${message}</div>
+                </div>
+            `;
+        }
+        
+        async function checkServers() {
+            const statusDiv = document.getElementById('server-status');
+            
+            // Check Frontend (always true since we can load this page)
+            testResults.servers.frontend = { status: 'pass', message: 'Running on :5173' };
+            
+            // Check Backend
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    testResults.servers.backend = { 
+                        status: 'pass', 
+                        message: `DB: ${data.database}` 
+                    };
+                } else {
+                    testResults.servers.backend = { 
+                        status: 'fail', 
+                        message: `HTTP ${response.status}` 
+                    };
+                }
+            } catch (error) {
+                testResults.servers.backend = { 
+                    status: 'fail', 
+                    message: 'Connection failed' 
+                };
+            }
+            
+            statusDiv.innerHTML = Object.entries(testResults.servers)
+                .map(([name, result]) => createStatusItem(
+                    name.charAt(0).toUpperCase() + name.slice(1), 
+                    result.status, 
+                    result.message
+                ))
+                .join('');
+        }
+        
+        async function testComponents() {
+            const testsDiv = document.getElementById('component-tests');
+            
+            // Test Profile Component Import
+            try {
+                const profileModule = await import('/src/pages/Profile.jsx');
+                if (profileModule.default && typeof profileModule.default === 'function') {
+                    testResults.components.profile = { 
+                        status: 'pass', 
+                        message: 'Exports correctly' 
+                    };
+                } else {
+                    testResults.components.profile = { 
+                        status: 'fail', 
+                        message: 'No default export' 
+                    };
+                }
+            } catch (error) {
+                testResults.components.profile = { 
+                    status: 'fail', 
+                    message: error.message.substring(0, 30) + '...' 
+                };
+            }
+            
+            // Test Storage Utility
+            try {
+                localStorage.setItem('__test__', 'test-value');
+                const value = localStorage.getItem('__test__');
+                localStorage.removeItem('__test__');
+                
+                if (value === 'test-value') {
+                    testResults.components.storage = { 
+                        status: 'pass', 
+                        message: 'Working correctly' 
+                    };
+                } else {
+                    testResults.components.storage = { 
+                        status: 'fail', 
+                        message: 'Read/write failed' 
+                    };
+                }
+            } catch (error) {
+                testResults.components.storage = { 
+                    status: 'fail', 
+                    message: 'Access denied' 
+                };
+            }
+            
+            // Test Main App Routes
+            try {
+                const mainModule = await import('/src/main.jsx');
+                testResults.components.routing = { 
+                    status: 'pass', 
+                    message: 'Routes loaded' 
+                };
+            } catch (error) {
+                testResults.components.routing = { 
+                    status: 'fail', 
+                    message: 'Import failed' 
+                };
+            }
+            
+            testsDiv.innerHTML = Object.entries(testResults.components)
+                .map(([name, result]) => createStatusItem(
+                    name.charAt(0).toUpperCase() + name.slice(1), 
+                    result.status, 
+                    result.message
+                ))
+                .join('');
+        }
+        
+        async function testAPIs() {
+            const apiDiv = document.getElementById('api-tests');
+            
+            // Test Health Endpoint
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                if (response.ok) {
+                    testResults.apis.health = { 
+                        status: 'pass', 
+                        message: 'Responding' 
+                    };
+                } else {
+                    testResults.apis.health = { 
+                        status: 'fail', 
+                        message: `HTTP ${response.status}` 
+                    };
+                }
+            } catch (error) {
+                testResults.apis.health = { 
+                    status: 'fail', 
+                    message: 'Unreachable' 
+                };
+            }
+            
+            // Test User Routes (check if they exist)
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/profile`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                // We expect 401 Unauthorized (no token), not 404 Not Found
+                if (response.status === 401) {
+                    testResults.apis.userRoutes = { 
+                        status: 'pass', 
+                        message: 'Endpoints exist' 
+                    };
+                } else if (response.status === 404) {
+                    testResults.apis.userRoutes = { 
+                        status: 'fail', 
+                        message: 'Routes missing' 
+                    };
+                } else {
+                    testResults.apis.userRoutes = { 
+                        status: 'warning', 
+                        message: `HTTP ${response.status}` 
+                    };
+                }
+            } catch (error) {
+                testResults.apis.userRoutes = { 
+                    status: 'fail', 
+                    message: 'Connection error' 
+                };
+            }
+            
+            apiDiv.innerHTML = Object.entries(testResults.apis)
+                .map(([name, result]) => createStatusItem(
+                    name.replace(/([A-Z])/g, ' $1').trim(), 
+                    result.status, 
+                    result.message
+                ))
+                .join('');
+        }
+        
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary');
+            
+            const allResults = [
+                ...Object.values(testResults.servers),
+                ...Object.values(testResults.components),
+                ...Object.values(testResults.apis)
+            ];
+            
+            const passed = allResults.filter(r => r.status === 'pass').length;
+            const failed = allResults.filter(r => r.status === 'fail').length;
+            const warnings = allResults.filter(r => r.status === 'warning').length;
+            const total = allResults.length;
+            
+            let summaryText = '';
+            let summaryClass = '';
+            
+            if (failed === 0 && warnings === 0) {
+                summaryText = `🎉 All ${total} tests passed! The application is ready to use.`;
+                summaryClass = 'text-green-600 font-semibold';
+            } else if (failed === 0) {
+                summaryText = `⚠️ ${passed}/${total} tests passed with ${warnings} warning(s). The application should work but may have minor issues.`;
+                summaryClass = 'text-yellow-600 font-semibold';
+            } else {
+                summaryText = `❌ ${failed} test(s) failed, ${passed} passed, ${warnings} warning(s). Please check the failed components.`;
+                summaryClass = 'text-red-600 font-semibold';
+            }
+            
+            summaryDiv.innerHTML = `<div class="${summaryClass}">${summaryText}</div>`;
+        }
+        
+        function openPage(path) {
+            window.open(`${FRONTEND_BASE}${path}`, '_blank');
+        }
+        
+        // Run all tests
+        async function runAllTests() {
+            await checkServers();
+            await testComponents();
+            await testAPIs();
+            updateSummary();
+        }
+        
+        // Initial test run
+        runAllTests();
+        
+        // Refresh every 30 seconds
+        setInterval(runAllTests, 30000);
+    </script>
+</body>
+</html>

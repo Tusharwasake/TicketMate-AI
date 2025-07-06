@@ -1,9 +1,17 @@
-# AI Ticket Assistant - API Documentation
+# AI Ticket Assistant - Backend API Documentation
 
 ## Base URL
 
+**Development:**
+
 ```
-http://localhost:3000/api
+http://localhost:4000/api
+```
+
+**Production:**
+
+```
+https://ticketmate-ai.onrender.com/api
 ```
 
 ## Authentication
@@ -20,7 +28,7 @@ Authorization: Bearer <token>
 
 ### POST /auth/signup
 
-Register a new user.
+Register a new user with role selection and skills.
 
 **Request Body:**
 
@@ -28,7 +36,8 @@ Register a new user.
 {
   "email": "user@example.com",
   "password": "password123",
-  "skills": ["javascript", "react"] // optional
+  "role": "user", // optional: "user" or "moderator" (default: "user")
+  "skills": ["javascript", "react", "customer support"] // optional array
 }
 ```
 
@@ -40,11 +49,35 @@ Register a new user.
     "_id": "user_id",
     "email": "user@example.com",
     "role": "user",
-    "skills": ["javascript", "react"],
+    "skills": ["javascript", "react", "customer support"],
     "createdAt": "2024-01-01T00:00:00.000Z"
   },
   "token": "jwt_token_here",
   "message": "User created successfully"
+}
+```
+
+**Error Responses:**
+
+```json
+// 400 - Validation Error
+{
+  "error": "Email and password are required"
+}
+
+// 400 - Invalid Role
+{
+  "error": "Invalid role. Allowed roles are: user, moderator"
+}
+
+// 400 - Invalid Skills
+{
+  "error": "All skills must be non-empty strings"
+}
+
+// 409 - User Exists
+{
+  "error": "User with this email already exists"
 }
 ```
 
