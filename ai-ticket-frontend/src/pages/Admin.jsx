@@ -41,7 +41,7 @@ export default function AdminPanel() {
     setError("");
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/users`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -62,7 +62,16 @@ export default function AdminPanel() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      const data = await res.json();
+      let data;
+      const responseText = await res.text();
+      
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseErr) {
+        console.error("Failed to parse response as JSON:", responseText);
+        throw new Error("Server returned invalid JSON response");
+      }
+      
       console.log("Fetched users data:", data); // Debug log
 
       // Handle different response structures
@@ -79,7 +88,7 @@ export default function AdminPanel() {
       applyFilters(usersArray, searchQuery, filterRole);
     } catch (err) {
       console.error("Error fetching users:", err);
-      setError("Failed to load users. Please try again.");
+      setError(err.message || "Failed to load users. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -135,7 +144,7 @@ export default function AdminPanel() {
         .filter(Boolean);
 
       const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/auth/update-user`,
+        `${import.meta.env.VITE_API_URL}/auth/update-user`,
         {
           method: "POST",
           headers: {
