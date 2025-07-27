@@ -12,6 +12,7 @@ import SignupPage from "./pages/Signup.jsx";
 import AdminPanel from "./pages/Admin.jsx";
 import AboutPage from "./pages/About.jsx";
 import ProfilePage from "./pages/Profile.jsx";
+import SettingsPage from "./pages/Settings.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -71,6 +72,14 @@ createRoot(document.getElementById("root")).render(
             element={
               <CheckAuth protected={true}>
                 <ProfilePage />
+              </CheckAuth>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <CheckAuth protected={true}>
+                <SettingsPage />
               </CheckAuth>
             }
           />
