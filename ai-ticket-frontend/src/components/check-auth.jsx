@@ -4,7 +4,8 @@ import { safeStorage } from "../utils/storage";
 
 function CheckAuth({ children, protected: isProtected = false }) {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);useEffect(() => {
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
     const checkAuthentication = () => {
       try {
         // Allow access to the /signup route for testing purposes
@@ -14,7 +15,7 @@ function CheckAuth({ children, protected: isProtected = false }) {
         }
 
         const token = safeStorage.getItem("token");
-        const userStr = safeStorage.getItem("user");        // Check if token exists and is valid format (basic validation)
+        const userStr = safeStorage.getItem("user"); // Check if token exists and is valid format (basic validation)
         const hasValidToken = token && token.length > 0;
 
         if (userStr) {
@@ -23,7 +24,8 @@ function CheckAuth({ children, protected: isProtected = false }) {
           } catch (parseError) {
             console.warn("Failed to parse user data:", parseError);
             safeStorage.removeItem("user");
-          }        }
+          }
+        }
 
         // Authentication check completed - no need to store state
 
@@ -43,7 +45,7 @@ function CheckAuth({ children, protected: isProtected = false }) {
           return;
         }
       } catch (error) {
-        console.error("Authentication check failed:", error);        // Clear corrupted data
+        console.error("Authentication check failed:", error); // Clear corrupted data
         safeStorage.removeItem("token");
         safeStorage.removeItem("user");
 

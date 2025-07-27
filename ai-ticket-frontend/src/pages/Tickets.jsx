@@ -49,7 +49,6 @@ export default function Tickets() {
       }
 
       const data = await res.json();
-      console.log("Fetched tickets data:", data); // Debug log
 
       // Handle different possible response structures
       if (Array.isArray(data)) {
@@ -108,7 +107,6 @@ export default function Tickets() {
       });
 
       const data = await res.json();
-      console.log("Create ticket response:", data); // Debug log
 
       if (res.ok) {
         setForm({ title: "", description: "" });

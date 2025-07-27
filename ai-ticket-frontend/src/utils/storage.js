@@ -4,7 +4,9 @@
 class FallbackStorage {
   constructor() {
     this.storage = new Map();
-    console.warn("Using fallback memory storage - data will not persist across browser sessions");
+    console.warn(
+      "Using fallback memory storage - data will not persist across browser sessions"
+    );
   }
 
   getItem(key) {
@@ -52,7 +54,9 @@ function getBestStorage() {
       return window.localStorage;
     }
     if (isStorageAvailable("sessionStorage")) {
-      console.warn("localStorage not available, falling back to sessionStorage");
+      console.warn(
+        "localStorage not available, falling back to sessionStorage"
+      );
       return window.sessionStorage;
     }
   } catch (e) {
@@ -65,7 +69,14 @@ function getBestStorage() {
 const storage = getBestStorage();
 
 // Add detailed logging to track storage fallback
-console.info("Using storage type:", storage instanceof FallbackStorage ? "FallbackStorage (in-memory)" : storage === window.sessionStorage ? "sessionStorage" : "localStorage");
+console.info(
+  "Using storage type:",
+  storage instanceof FallbackStorage
+    ? "FallbackStorage (in-memory)"
+    : storage === window.sessionStorage
+    ? "sessionStorage"
+    : "localStorage"
+);
 
 export const safeStorage = {
   getItem: (key) => {

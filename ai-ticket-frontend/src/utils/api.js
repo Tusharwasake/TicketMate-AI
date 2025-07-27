@@ -32,7 +32,7 @@ export const apiClient = {
   async request(endpoint, options = {}) {
     const maxRetries = 3;
     const retryDelay = 2000; // 2 seconds
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const token = safeStorage.getItem("token");
@@ -42,8 +42,6 @@ export const apiClient = {
           ? endpoint
           : `/${endpoint}`;
         const url = `${this.baseURL}${cleanEndpoint}`;
-
-        console.log(`API Request (attempt ${attempt}): ${options.method || "GET"} ${url}`);
 
         const config = {
           headers: {
@@ -73,8 +71,7 @@ export const apiClient = {
         if (!response.ok) {
           // For server errors, check if we should retry
           if (response.status >= 500 && attempt < maxRetries) {
-            console.log(`Server error ${response.status}, retrying in ${retryDelay}ms...`);
-            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            await new Promise((resolve) => setTimeout(resolve, retryDelay));
             continue;
           }
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -83,14 +80,17 @@ export const apiClient = {
         return await response.json();
       } catch (error) {
         console.error(`API request failed (attempt ${attempt}):`, error);
-        
+
         // Check if it's a network error and we should retry
-        if ((error.name === 'TypeError' || error.message.includes('Failed to fetch')) && attempt < maxRetries) {
-          console.log(`Network error, retrying in ${retryDelay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        if (
+          (error.name === "TypeError" ||
+            error.message.includes("Failed to fetch")) &&
+          attempt < maxRetries
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
           continue;
         }
-        
+
         // If it's the last attempt or a non-retryable error, throw it
         throw error;
       }
@@ -127,6 +127,5 @@ export const apiClient = {
 
   async delete(endpoint, options = {}) {
     return this.request(endpoint, { ...options, method: "DELETE" });
-  },
   },
 };

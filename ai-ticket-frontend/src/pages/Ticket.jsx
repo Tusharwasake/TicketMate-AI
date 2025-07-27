@@ -77,7 +77,6 @@ export default function TicketDetailsPage() {
         }
 
         const data = await res.json();
-        console.log("Fetched ticket data:", data);
 
         // Handle different response structures
         if (data.ticket) {
@@ -137,7 +136,6 @@ export default function TicketDetailsPage() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
-      console.log("Reply submitted:", data);
 
       // Clear the reply form and refresh ticket
       setReplyText("");

@@ -20,9 +20,9 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "http://localhost:3000", 
+      "http://localhost:3000",
       "https://aiagentticket.netlify.app",
-      "https://ticketmate-ai.netlify.app"
+      "https://ticketmate-ai.netlify.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -31,14 +31,15 @@ app.use(
       "Authorization",
       "X-Requested-With",
       "Accept",
-      "Origin"
-    ]
+      "Origin",
+    ],
   })
 );
 
 app.use(express.json());
 
 // Add security headers for CORS
+
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -47,10 +48,11 @@ app.use((req, res, next) => {
 });
 
 app.get("/health", async (req, res) => {
-  res.json({ 
-    status: "healthy", 
+  res.json({
+    status: "healthy",
     timestamp: new Date().toISOString(),
-    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+    database:
+      mongoose.connection.readyState === 1 ? "connected" : "disconnected",
   });
 });
 app.use("/api/auth", userRoutes);
@@ -67,10 +69,10 @@ app.use("/api/inngest", inngestHandler);
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {
-    console.log("MonGoDB connected ");
+    console.log("MongoDB connected ");
     app.listen(PORT, async () => {
-      console.log(`✅Server Started at: http://localhost:${PORT}`);
-      console.log(`➡️ Inngest running at http://localhost:${PORT}/api/inngest`);
+      console.log(`Server Started at: http://localhost:${PORT}`);
+      console.log(`Inngest running at http://localhost:${PORT}/api/inngest`);
 
       if (process.env.RENDER_EXTERNAL_URL) {
         console.log(
